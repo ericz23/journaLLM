@@ -59,11 +59,11 @@ def _build_context_payload(entries: List[Dict], coverage_line: str) -> Dict:
     }
 
 
-def build_recent_context(days: int = 14, max_entries: int = 7) -> Dict:
+def build_recent_context(days: int = 14) -> Dict:
     """
     Fetch recent entries and return both structured data and formatted text snippets.
     """
-    entries = list_recent_entries(days=days, limit=max_entries)
+    entries = list_recent_entries(days=days)
     if entries:
         coverage_line = (
             f"Recent journal coverage: {entries[0]['date']} to {entries[-1]['date']} "
@@ -77,14 +77,11 @@ def build_recent_context(days: int = 14, max_entries: int = 7) -> Dict:
 def build_context_window(
     start: dt.date,
     end: dt.date,
-    max_entries: Optional[int] = None,
 ) -> Dict:
     """
     Build a context package for entries within an explicit date window.
     """
     entries = list_entries_between(start, end)
-    if max_entries:
-        entries = entries[-max_entries:]
 
     if entries:
         coverage_line = (

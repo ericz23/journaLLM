@@ -1,6 +1,11 @@
+import datetime as dt
 import json
+from typing import Sequence
+
 import google.generativeai as genai
+
 from .config import GEMINI_API_KEY
+from .context_builder import build_context_window
 
 genai.configure(api_key=GEMINI_API_KEY)
 
@@ -91,3 +96,56 @@ Keep answers concise and concrete.
 
     response = model.generate_content(prompt)
     return response.text.strip()
+
+
+def chat_with_journal_context(
+    message: str,
+    start_date: dt.date | str,
+    end_date: dt.date | str,
+    history: Sequence[tuple[str, str]] | None = None,
+) -> str:
+    """
+    Chat with the assistant using journal context from the specified date window.
+    """
+    window_start = _ensure_date(start_date)
+    window_end = _ensure_date(end_date)
+
+    context = build_context_window(window_start, window_end)
+    context_text = context["text"]
+
+    model = get_model()
+    system_instructions = f"""
+You are a personal journaling assistant.
+You have access to structured journal summaries covering {window_start} to {window_end}.
+Use the provided context verbatim; do not fabricate details outside it.
+If the context does not mention something, say you are unsure.
+Keep answers concise, reflective, and actionable.
+"""
+
+    history_text = ""
+    if history:
+        history_lines = ["Conversation history:"]
+        for idx, (user_msg, assistant_msg) in enumerate(history, start=1):
+            history_lines.append(f"{idx}. User: {user_msg}")
+            history_lines.append(f"{idx}. Assistant: {assistant_msg}")
+        history_text = "\n".join(history_lines) + "\n\n"
+
+    prompt = (
+        system_instructions
+        + "\n\n=== Journal Context Start ===\n"
+        + context_text
+        + "\n=== Journal Context End ===\n\n"
+        + history_text
+        + "User question: "
+        + message
+        + "\nAssistant:"
+    )
+
+    response = model.generate_content(prompt)
+    return response.text.strip()
+
+
+def _ensure_date(value: dt.date | str) -> dt.date:
+    if isinstance(value, dt.date):
+        return value
+    return dt.date.fromisoformat(value)

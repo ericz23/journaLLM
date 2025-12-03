@@ -54,17 +54,14 @@ def list_entries_between(start: dt.date, end: dt.date) -> List[Dict]:
             .where(JournalEntry.entry_date.between(start, end))
             .order_by(JournalEntry.entry_date.asc())
         )
-        rows = session.scalars(query).all()
+        rows = session.execute(query).unique().scalars().all()
         return [_serialize_entry(row) for row in rows]
 
 
-def list_recent_entries(days: int = 14, limit: int = 7) -> List[Dict]:
+def list_recent_entries(days: int = 14) -> List[Dict]:
     """
     Convenience helper to fetch the most recent entries.
     """
     end = dt.date.today()
     start = end - dt.timedelta(days=days)
-    entries = list_entries_between(start, end)
-    if limit:
-        return entries[-limit:]
-    return entries
+    return list_entries_between(start, end)
