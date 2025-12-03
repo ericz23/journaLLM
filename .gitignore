@@ -2,3 +2,5 @@ notes/
 .DS_Store
 .env
 .venv/
+backend/data/
+backend/__pycache__
