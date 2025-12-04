@@ -4,6 +4,7 @@ CLI utility to ingest a journal file, extract metadata via Gemini, and persist i
 
 import argparse
 import datetime as dt
+import hashlib
 import re
 from pathlib import Path
 from typing import Optional
@@ -42,18 +43,32 @@ def _safe_float(value, default: float) -> float:
         return default
 
 
-def ingest_journal(path: Path, entry_date: dt.date) -> None:
+def _content_hash(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def ingest_journal(path: Path, entry_date: dt.date, skip_if_unchanged: bool = True) -> bool:
+    """
+    Ingest a single file. Returns True if processed (new or updated), False if skipped.
+    """
     text = path.read_text(encoding="utf-8")
-    metadata = extract_journal_metadata(text)
+    file_hash = _content_hash(text)
 
     with get_session() as session:
         existing = (
             session.query(JournalEntry)
-            .filter(JournalEntry.entry_date == entry_date)
+            .filter(JournalEntry.source_path == str(path))
             .one_or_none()
         )
+
+        if existing and skip_if_unchanged and existing.file_hash == file_hash:
+            print(f"Skipping unchanged entry: {path}")
+            return False
+
+        metadata = extract_journal_metadata(text)
+
         if existing:
-            print(f"Replacing existing entry dated {entry_date.isoformat()}")
+            print(f"Updating existing entry from {path}")
             session.delete(existing)
             session.flush()
 
@@ -61,6 +76,7 @@ def ingest_journal(path: Path, entry_date: dt.date) -> None:
             entry_date=entry_date,
             source_path=str(path),
             raw_text=text,
+            file_hash=file_hash,
         )
         session.add(entry)
         session.flush()
@@ -91,6 +107,7 @@ def ingest_journal(path: Path, entry_date: dt.date) -> None:
             session.add(event)
 
     print(f"Ingested journal for {entry_date.isoformat()} from {path}")
+    return True
 
 
 def main() -> None:
@@ -100,6 +117,11 @@ def main() -> None:
         "--date",
         type=str,
         help="Entry date in YYYY-MM-DD. Defaults to date inferred from filename or today.",
+    )
+    parser.add_argument(
+        "--no-skip",
+        action="store_true",
+        help="Reingest even if the file content has not changed.",
     )
     args = parser.parse_args()
 
@@ -113,7 +135,7 @@ def main() -> None:
     if entry_date is None:
         entry_date = dt.date.today()
 
-    ingest_journal(path, entry_date)
+    ingest_journal(path, entry_date, skip_if_unchanged=not args.no_skip)
 
 
 if __name__ == "__main__":

@@ -23,7 +23,8 @@ class JournalEntry(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     entry_date = Column(Date, nullable=False)
-    source_path = Column(String(255), nullable=True)
+    source_path = Column(String(255), nullable=True, unique=True)
+    file_hash = Column(String(64), nullable=True)
     raw_text = Column(Text, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
