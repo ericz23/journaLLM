@@ -1,10 +1,10 @@
 import sys
 from pathlib import Path
-from backend.gemini_client import extract_journal_metadata
+from backend.services.gemini_client import extract_journal_metadata
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python -m backend.test_extract path/to/journal.md")
+        print("Usage: python -m backend.scripts.test_extract path/to/journal.md")
         raise SystemExit(1)
 
     path = Path(sys.argv[1])

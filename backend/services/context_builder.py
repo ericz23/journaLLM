@@ -7,7 +7,7 @@ from __future__ import annotations
 import datetime as dt
 from typing import Dict, List, Optional
 
-from .repository import list_entries_between, list_recent_entries
+from backend.data_access.repository import list_entries_between, list_recent_entries
 
 
 def _avg(values: List[Optional[float]]) -> Optional[float]:

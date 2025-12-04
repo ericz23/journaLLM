@@ -15,7 +15,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from .db import Base
+from backend.core.db import Base
 
 
 class JournalEntry(Base):

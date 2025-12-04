@@ -9,8 +9,8 @@ import re
 from pathlib import Path
 from typing import Optional
 
-from backend.db import get_session
-from backend.gemini_client import extract_journal_metadata
+from backend.core.db import get_session
+from backend.services.gemini_client import extract_journal_metadata
 from backend.models import Event, JournalEntry, JournalMetadata, Person
 
 DATE_PATTERN = re.compile(r"\d{4}-\d{2}-\d{2}")

@@ -4,7 +4,7 @@ from typing import Sequence
 
 import google.generativeai as genai
 
-from .config import GEMINI_API_KEY
+from backend.core.config import GEMINI_API_KEY
 from .context_builder import build_context_window
 
 genai.configure(api_key=GEMINI_API_KEY)

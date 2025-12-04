@@ -10,8 +10,8 @@ from typing import Dict, List, Optional
 from sqlalchemy import func, select
 from sqlalchemy.orm import joinedload
 
-from .db import get_session
-from .models import Event, JournalEntry, JournalMetadata, Person
+from backend.core.db import get_session
+from backend.models import Event, JournalEntry, JournalMetadata, Person
 
 
 def _serialize_entry(entry: JournalEntry) -> Dict:

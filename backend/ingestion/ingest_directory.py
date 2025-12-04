@@ -7,7 +7,7 @@ import datetime as dt
 from pathlib import Path
 from typing import Optional
 
-from backend.ingest_journal import ingest_journal, _infer_date_from_filename
+from backend.ingestion.ingest_journal import ingest_journal, _infer_date_from_filename
 
 
 def ingest_directory(notes_dir: Path, skip_if_unchanged: bool = True) -> None:
