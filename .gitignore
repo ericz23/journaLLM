@@ -5,3 +5,4 @@ notes/
 backend/core/data/
 __pycache__/
 *.pyc
+.cursorignore

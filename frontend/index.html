@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JournaLLM - AI Journal Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with date controls -->
+        <header class="header">
+            <div class="header-content">
+                <h1>JournaLLM</h1>
+                <p class="subtitle">Your private AI journal assistant</p>
+            </div>
+            <div class="date-controls">
+                <div class="date-field">
+                    <label for="start-date">From</label>
+                    <input type="date" id="start-date">
+                </div>
+                <div class="date-field">
+                    <label for="end-date">To</label>
+                    <input type="date" id="end-date">
+                </div>
+                <button id="clear-chat" class="btn-secondary" title="Clear conversation">
+                    Clear
+                </button>
+            </div>
+        </header>
+
+        <!-- Chat messages area -->
+        <main class="chat-container" id="chat-container">
+            <div class="welcome-message" id="welcome-message">
+                <div class="welcome-icon">📔</div>
+                <h2>Welcome to JournaLLM</h2>
+                <p>Set your date range above and start chatting about your journal entries.</p>
+                <p class="privacy-note">🔒 All processing happens locally on your machine.</p>
+            </div>
+        </main>
+
+        <!-- Input area -->
+        <footer class="input-container">
+            <form id="chat-form">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Ask about your journal entries..."
+                        rows="1"
+                        autofocus
+                    ></textarea>
+                    <button type="submit" id="send-btn" title="Send message">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </footer>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
