@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from backend.services.gemini_client import extract_journal_metadata
+from backend.services.llm_client import extract_journal_metadata
 
 def main():
     if len(sys.argv) < 2:

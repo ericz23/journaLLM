@@ -5,7 +5,7 @@ Simple CLI to chat with the journal assistant using a date-window context.
 import argparse
 import datetime as dt
 
-from backend.services.gemini_client import chat_with_journal_context
+from backend.services.llm_client import chat_with_journal_context
 
 
 def _parse_date(value: str) -> dt.date:

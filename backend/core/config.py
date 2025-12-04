@@ -9,9 +9,8 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 load_dotenv()
 
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise RuntimeError("GEMINI_API_KEY not set in .env")
+# Ollama model configuration (runs locally, no API key needed)
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "llama3.2")
 
 _DEFAULT_DB_PATH = DATA_DIR / "journals.db"
 DATABASE_URL = os.environ.get("DATABASE_URL", f"sqlite:///{_DEFAULT_DB_PATH}")

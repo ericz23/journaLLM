@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Optional
 
-from backend.core.db import get_session
+from backend.db import get_session
 from backend.services.llm_client import extract_journal_metadata
 from backend.models import Event, JournalEntry, JournalMetadata, Person
 
