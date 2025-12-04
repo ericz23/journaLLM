@@ -217,3 +217,4 @@ function clearChat() {
 
 // Initialize app
 init();
+

@@ -42,3 +42,4 @@ if FRONTEND_DIR.exists():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
+
