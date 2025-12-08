@@ -13,7 +13,7 @@ from datetime import date, datetime
 from typing import Optional, List, Any
 
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from backend.core.config import WHOOP_API_BASE_URL
 
@@ -187,13 +187,11 @@ class WhoopClient:
             "Content-Type": "application/json",
         }
     
-    async def _get(self, endpoint: str, params: dict = None, debug: bool = False) -> dict:
+    async def _get(self, endpoint: str, params: dict = None) -> dict:
         """Make a GET request to the WHOOP API."""
         url = f"{self.base_url}{endpoint}"
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=self._headers(), params=params)
-            if debug:
-                print(f"[DEBUG] {endpoint} -> {response.status_code}: {response.text[:500]}")
             # Some endpoints return 404 when no data exists for the query
             if response.status_code == 404:
                 return {"records": []}

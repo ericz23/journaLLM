@@ -3,23 +3,31 @@
  */
 
 const API_BASE = '/api/chat';
+const WHOOP_API_BASE = '/api/whoop';
 
-// DOM Elements
-const chatContainer = document.getElementById('chat-container');
-const welcomeMessage = document.getElementById('welcome-message');
-const chatForm = document.getElementById('chat-form');
-const messageInput = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
-const startDateInput = document.getElementById('start-date');
-const endDateInput = document.getElementById('end-date');
-const clearChatBtn = document.getElementById('clear-chat');
+// DOM Elements (initialized in init())
+let chatContainer, welcomeMessage, chatForm, messageInput, sendBtn;
+let startDateInput, endDateInput, clearChatBtn, whoopBtn, whoopStatusDot;
 
 // State
 let conversationHistory = [];
 let isLoading = false;
+let whoopConnected = false;
 
 // Initialize
 function init() {
+    // Get DOM elements
+    chatContainer = document.getElementById('chat-container');
+    welcomeMessage = document.getElementById('welcome-message');
+    chatForm = document.getElementById('chat-form');
+    messageInput = document.getElementById('message-input');
+    sendBtn = document.getElementById('send-btn');
+    startDateInput = document.getElementById('start-date');
+    endDateInput = document.getElementById('end-date');
+    clearChatBtn = document.getElementById('clear-chat');
+    whoopBtn = document.getElementById('whoop-btn');
+    whoopStatusDot = document.getElementById('whoop-status-dot');
+    
     // Set default dates (last 14 days)
     const today = new Date();
     const twoWeeksAgo = new Date(today);
@@ -34,8 +42,31 @@ function init() {
     messageInput.addEventListener('keydown', handleKeyDown);
     clearChatBtn.addEventListener('click', clearChat);
     
+    // WHOOP button click handler
+    if (whoopBtn) {
+        console.log('WHOOP button found, adding click handler');
+        whoopBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('WHOOP button clicked!');
+            handleWhoopClick();
+        });
+    } else {
+        console.error('WHOOP button not found!');
+    }
+    
     // Auto-resize textarea on load
     autoResize.call(messageInput);
+    
+    // Check WHOOP connection status
+    checkWhoopStatus();
+    
+    // Check for WHOOP connection callback
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('whoop_connected') === 'true') {
+        // Clear the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+        checkWhoopStatus();
+    }
 }
 
 // Format date to YYYY-MM-DD
@@ -215,6 +246,62 @@ function clearChat() {
     messageInput.focus();
 }
 
-// Initialize app
-init();
+// =============================================================================
+// WHOOP Integration
+// =============================================================================
+
+// Check WHOOP connection status
+async function checkWhoopStatus() {
+    try {
+        const response = await fetch(WHOOP_API_BASE + '/status');
+        if (response.ok) {
+            const data = await response.json();
+            updateWhoopUI(data.authenticated);
+        }
+    } catch (error) {
+        console.error('Failed to check WHOOP status:', error);
+        updateWhoopUI(false);
+    }
+}
+
+// Update WHOOP button UI based on connection status
+function updateWhoopUI(connected) {
+    whoopConnected = connected;
+    
+    if (!whoopBtn || !whoopStatusDot) return;
+    
+    if (connected) {
+        whoopBtn.classList.add('connected');
+        whoopStatusDot.classList.add('connected');
+        whoopBtn.title = 'WHOOP Connected - Click to disconnect';
+    } else {
+        whoopBtn.classList.remove('connected');
+        whoopStatusDot.classList.remove('connected');
+        whoopBtn.title = 'Connect WHOOP';
+    }
+}
+
+// Handle WHOOP button click
+function handleWhoopClick() {
+    console.log('handleWhoopClick called, connected:', whoopConnected);
+    if (whoopConnected) {
+        // Show confirmation before disconnecting
+        if (confirm('Disconnect from WHOOP?')) {
+            fetch(WHOOP_API_BASE + '/logout', { method: 'POST' })
+                .then(() => updateWhoopUI(false))
+                .catch(error => console.error('Failed to disconnect WHOOP:', error));
+        }
+    } else {
+        // Redirect to WHOOP OAuth login
+        console.log('Redirecting to:', WHOOP_API_BASE + '/login');
+        window.location.href = WHOOP_API_BASE + '/login';
+    }
+}
+
+// Initialize app when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
