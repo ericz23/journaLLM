@@ -9,6 +9,8 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 
 from backend.api.chat import router as chat_router
+from backend.api.whoop_oauth import router as whoop_router
+from backend.api.whoop_data import router as whoop_data_router
 
 app = FastAPI(
     title="JournaLLM",
@@ -27,6 +29,8 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(chat_router)
+app.include_router(whoop_router)
+app.include_router(whoop_data_router)
 
 # Serve static frontend files
 FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
